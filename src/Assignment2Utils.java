@@ -39,7 +39,7 @@ public class Assignment2Utils {
 
         BigInteger[] n = {a, b, c, d};
 
-        System.out.println(gcdArray(n));
+        System.out.println(gcdOfN(n));
         System.out.println(gcd(a, b));
 
     }
