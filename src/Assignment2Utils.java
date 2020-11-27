@@ -13,6 +13,16 @@ public class Assignment2Utils {
         return (b.intValue() == 0) ? a : gcd(b, a.mod(b));
     }
 
+    public static BigInteger gcdOfN(BigInteger[] n) {
+        // GCD implemented for n number of BigIntegers
+        BigInteger sol = n[0];
+
+        for (int i = 0; i < n.length; i++)
+            sol = gcd(sol, n[i]);
+
+        return sol;
+    }
+
     public static BigInteger multiplicativeInverse(BigInteger a, BigInteger b) {
         return a;
     }
@@ -22,9 +32,15 @@ public class Assignment2Utils {
     }
 
     public static void main(String[] args) {
-        BigInteger a = new BigInteger("10");
+        BigInteger a = new BigInteger("4");
         BigInteger b = new BigInteger("12");
+        BigInteger c = new BigInteger("6");
+        BigInteger d = new BigInteger("18");
 
+        BigInteger[] n = {a, b, c, d};
+
+        System.out.println(gcdArray(n));
         System.out.println(gcd(a, b));
+
     }
 }
