@@ -17,8 +17,8 @@ You will then digitally sign the digest of an input binary file using your RSA d
 The implementation language must be Java. Your program should take an additional filename in the command line and output to standard output the result of digitally signing this file. The input binary file will be the Java class file resulting from compiling your program.
 
 You can make use of
-* BigInteger class (java.math.BigInteger),
-* java.security.*) and
+* BigInteger class java.math.BigInteger),
+* java.security.*, and
 * the crypto libraries (javax.crypto.*).
     * including methods relating to SHA-256 hashing
 
