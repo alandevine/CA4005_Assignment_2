@@ -37,22 +37,44 @@ public class Assignment2Utils {
         return (b.intValue() == 0) ? a : gcd(b, a.mod(b));
     }
 
-    public static BigInteger modInverse(BigInteger a, BigInteger b) {
-        assert(gcd(a, b) == BigInteger.ONE);
+    public static BigInteger multInverse(BigInteger a, BigInteger b) {
         BigInteger[] ans = eGCD(a, b);
+        return (ans[1].compareTo(BigInteger.ONE) < 0) ? ans[1].add(b) : ans[1];
+    }
 
-        if (ans[1].compareTo(BigInteger.ONE) != 0) return ans[1];
-        return ans[1].add(b);
+    public static BigInteger chineseRemainderTheorem(BigInteger[] b, BigInteger[] n) {
+        BigInteger[] N = new BigInteger[n.length];
+        BigInteger[] Y = new BigInteger[n.length];
+
+        BigInteger nProd = BigInteger.ONE;
+
+        for (BigInteger i : n)
+            nProd = nProd.multiply(i);
+
+        for (int i = 0; i < n.length; i++) {
+            N[i] = nProd.divide(n[i]);
+            Y[i] = multInverse(N[i], (n[i]));
+        }
+
+        BigInteger sum = BigInteger.ZERO;
+
+        for (int i = 0; i < n.length; i++)
+            sum = sum.add( b[i].multiply(N[i].multiply(Y[i])));
+
+        return sum.mod(nProd);
     }
 
     public static void main(String[] args) {
-        BigInteger a = new BigInteger("3");
-        BigInteger b = new BigInteger("17");
-        BigInteger c = new BigInteger("1");
-        BigInteger d = new BigInteger("1");
+        BigInteger[] a = new BigInteger[3];
+        a[0] = new BigInteger("2");
+        a[1] = new BigInteger("3");
+        a[2] = new BigInteger("2");
 
-        // BigInteger[] n = {a, b, c, d};
+        BigInteger[] n = new BigInteger[3];
+        n[0] = new BigInteger("3");
+        n[1] = new BigInteger("5");
+        n[2] = new BigInteger("7");
 
-        System.out.println(modInverse(a, b));
+        System.out.println(chineseRemainderTheorem(a, n));
     }
 }
