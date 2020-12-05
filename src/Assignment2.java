@@ -1,8 +1,13 @@
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.math.BigInteger;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.Random;
 
@@ -24,7 +29,27 @@ public class Assignment2 {
         return n.toByteArray();
     }
 
-    public static void main(String[] args) throws IOException {
+    public static BigInteger decrypt(BigInteger c, BigInteger d, BigInteger p, BigInteger q) {
+
+        // m = c^d (mod n)
+
+        // My implementation of CRT takes arrays of big integers as input
+        BigInteger[] crypt_p = new BigInteger[] {CryptoMath.rightToLeftModExponentiation(c, d.mod(p.subtract(BigInteger.ONE)), p)};
+        BigInteger[] crypt_q = new BigInteger[] {CryptoMath.rightToLeftModExponentiation(c, d.mod(q.subtract(BigInteger.ONE)), q)};
+
+        return CryptoMath.chineseRemainderTheorem(crypt_p, crypt_q);
+
+    }
+
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException{
+
+        String inputFile = (args.length > 0) ? args[0] : null;
+
+        if (inputFile == null) {
+            System.out.println("Please provide a file to be encrypted.");
+            System.exit(0);
+        }
+
         Random rand = new Random();
 
         final BigInteger e = new BigInteger("65537");
@@ -37,15 +62,25 @@ public class Assignment2 {
 
             n = p.multiply(q);
 
-            writeToFile("Modulus.txt", bytesToHex(BItoByte(n)));
+            writeToFile("Modulus.txt", n.toString(16));
 
             phi = CryptoMath.eulerTotient(p, q);
-            System.out.println(phi);
         } while (CryptoMath.gcd(e, phi).intValue() != 1);
 
         BigInteger d = CryptoMath.multInverse(e, phi);
 
 
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+        File ip = new File(inputFile);
+        InputStream is = new FileInputStream(ip);
+        byte[] inputBytes = is.readAllBytes();
+
+        BigInteger c = new BigInteger(1, inputBytes);
+
+        BigInteger signedDigest = decrypt(c, d, p, q);
+
+        System.out.println(signedDigest.toString(16));
     }
 }
 
@@ -111,6 +146,9 @@ class CryptoMath {
     }
 
     public static BigInteger chineseRemainderTheorem(BigInteger[] b, BigInteger[] n) {
+
+        assert(b.length == n.length);
+
         BigInteger[] N = new BigInteger[n.length];
         BigInteger[] Y = new BigInteger[b.length];
 
@@ -130,5 +168,23 @@ class CryptoMath {
             sum = sum.add(b[i].multiply(N[i].multiply(Y[i])));
 
         return sum.mod(nProd);
+    }
+
+    public static BigInteger rightToLeftModExponentiation(BigInteger a, BigInteger exp, BigInteger mod) {
+
+        /*
+         * This method implements right-to-left modular exponentiation
+         * */
+
+        int k = exp.bitLength();
+
+        BigInteger y = new BigInteger("1");
+
+        for (int i = k - 1; i >= 0; i--){
+            y = y.multiply(y).mod(mod);
+            y = (exp.testBit(i)) ? y.multiply(a).mod(mod) : y;
+        }
+
+        return y;
     }
 }
