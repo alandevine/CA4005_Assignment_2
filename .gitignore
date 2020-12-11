@@ -1,5 +1,7 @@
 *.class
 *.txt
 *.iml
-src/eh
 .idea
+*.pdf
+*.zip
+.gitignore
